@@ -1,0 +1,18 @@
+{
+  "name": "groot",
+  "version": "0.0.0",
+  "description": "Demo of trunk based 🌳 workflow with build once artifact promotion",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:clowdhaus/i-am-groot.git"
+  },
+  "author": "Clowd Haus, LLC",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/clowdhaus/i-am-groot/issues"
+  },
+  "homepage": "https://github.com/clowdhaus/i-am-groot/#readme",
+  "dependencies": {
+    "serverless": "^2.27.1"
+  }
+}

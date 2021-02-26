@@ -1,0 +1,33 @@
+service: groot
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: python3.8
+  lambdaHashingVersion: 20201221
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  timeout: 30
+  memorySize: 256
+  logRetentionInDays: 30
+  deploymentBucket:
+    name: serverless-028920223318-us-east-1
+  versionFunctions: false
+  tags:
+    Service: groot
+    Environment: ${self:provider.stage}
+    CreatedBy: serverless
+    Repository: https://github.com/clowdhaus/i-am-groot
+    Version: ${opt:version, 'dev'}
+    CommitSha: ${opt:commitSha, 'dev'}
+
+package:
+  exclude:
+    - '**/*'
+  include:
+    - '*.py'
+
+functions:
+  hello:
+    handler: handler.hello

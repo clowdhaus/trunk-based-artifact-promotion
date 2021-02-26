@@ -1,0 +1,90 @@
+name: serverless-deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'serverless/**'
+    tags:
+      - 'rc-*'
+      - 'v*'
+
+defaults:
+  run:
+    working-directory: serverless
+
+jobs:
+  deploy:
+    name: Deploy lambdas to AWS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: main
+          fetch-depth: 3
+
+      - name: Configure AWS credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Set up Node.js 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install node dependencies
+        run: yarn
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install pipenv
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pipenv
+
+      - name: Set environment variables
+        run: |
+          echo "BUILD_DATE=$(date +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+          echo "GIT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "GIT_REF=$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match)" >> $GITHUB_ENV
+          echo "GIT_TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+
+      - name: Generate zip Artifacts
+        # run when change pushed to main - build once
+        if: github.ref == 'refs/heads/main'
+        run: |
+          yarn run sls package
+          aws s3 sync .serverless s3://serverless-028920223318-us-east-1/$GIT_SHA
+
+      - name: Deploy to stage
+        # run when change pushed to main
+        if: github.ref == 'refs/heads/main'
+        run: |
+          aws s3 sync s3://serverless-028920223318-us-east-1/$GIT_SHA .serverless
+          ls -la
+          ls -la .serverless
+          yarn run sls deploy --stage stage --package .serverless --commitSha $GIT_SHA --version $GIT_SHA
+
+      - name: Deploy to demo
+        # run when release tag pushed
+        if: startsWith(github.ref, 'refs/tags/rc-')
+        run: |
+          aws s3 sync s3://serverless-028920223318-us-east-1/$GIT_SHA .serverless
+          yarn run sls deploy --stage demo --package .serverless --commitSha $GIT_SHA --version $GIT_TAG
+
+      - name: Deploy to prod
+        # run when release tag pushed
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          aws s3 sync s3://serverless-028920223318-us-east-1/$GIT_SHA .serverless
+          yarn run sls deploy --stage prod --package .serverless --commitSha $GIT_SHA --version $GIT_TAG

@@ -13,6 +13,6 @@
   },
   "homepage": "https://github.com/clowdhaus/i-am-groot/#readme",
   "dependencies": {
-    "serverless": "^2.28.0"
+    "serverless": "^2.41.2"
   }
 }

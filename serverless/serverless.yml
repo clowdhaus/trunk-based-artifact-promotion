@@ -1,4 +1,4 @@
-service: groot
+service: trunk-based-artifact-promotion
 
 frameworkVersion: '2'
 
@@ -15,17 +15,17 @@ provider:
     name: serverless-028920223318-us-east-1
   versionFunctions: false
   tags:
-    Service: groot
+    service: ${self:service}
     Environment: ${self:provider.stage}
     CreatedBy: serverless
-    Repository: https://github.com/clowdhaus/i-am-groot
+    Repository: https://github.com/clowdhaus/trunk-based-artifact-promotion
     Version: ${opt:version, 'dev'}
     CommitSha: ${opt:commitSha, 'dev'}
+  stackTags: ${self:provider.tags}
 
 package:
-  exclude:
-    - '**/*'
-  include:
+  patterns:
+    - '!**/**'
     - '*.py'
 
 functions:

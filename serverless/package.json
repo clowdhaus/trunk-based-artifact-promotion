@@ -16,6 +16,7 @@
     "ansi-regex": "^5.0.1"
   },
   "dependencies": {
-    "serverless": "^2.63.0"
+    "ansi-regex": "^6.0.1",
+    "serverless": "^3.1.1"
   }
 }

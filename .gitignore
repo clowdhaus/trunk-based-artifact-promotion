@@ -50,3 +50,6 @@ coverage.xml
 *.coverage
 .hypothesis/
 .mypy_cache/
+
+# Lockfile
+*.lock

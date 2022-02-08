@@ -1,19 +1,16 @@
 service: trunk-based-artifact-promotion
 
-frameworkVersion: '2'
+frameworkVersion: '3'
 
 provider:
   name: aws
-  runtime: python3.8
+  runtime: python3.9
   lambdaHashingVersion: 20201221
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
   timeout: 30
   memorySize: 256
   logRetentionInDays: 30
-  deploymentBucket:
-    name: serverless-028920223318-us-east-1
-  versionFunctions: false
   tags:
     service: ${self:service}
     Environment: ${self:provider.stage}
